@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Basic 1 Quiz - Speaking Partner</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --accent-color: #f1c40f;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            max-width: 700px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            border-top: 8px solid var(--primary-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--primary-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-tag {
+            display: inline-block;
+            background: #e8f4fd;
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-item.selected {
+            border-color: var(--primary-color);
+            background: #eef6fc;
+            color: var(--primary-color);
+        }
+
+        .option-prefix {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            text-align: center;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            background: white;
+        }
+
+        .option-item.selected .option-prefix {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-next {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-next:hover {
+            background: var(--primary-hover);
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .result-screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #e8fdf0;
+            border: 5px solid var(--success-color);
+            color: var(--success-color);
+            font-size: 36px;
+            font-weight: bold;
+            line-height: 110px;
+            margin: 0 auto 20px auto;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result-feedback {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .review-section {
+            text-align: left;
+            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 30px;
+        }
+
+        .review-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #334155;
+        }
+
+        .review-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #cbd5e1;
+        }
+
+        .review-item.correct {
+            border-left-color: var(--success-color);
+        }
+
+        .review-item.incorrect {
+            border-left-color: var(--error-color);
+        }
+
+        .review-q-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .review-ans {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .review-explanation {
+            font-size: 14px;
+            color: #64748b;
+            background: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .btn-restart {
+            background: #475569;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <header id="quiz-header">
+        <h1>Mini Test: English Basic 1</h1>
+        <p>Materi Day 1 - Day 5 (Speaking Partner)</p>
+    </header>
+
+    <div class="progress-bar-container" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-questions">
+        <!-- Questions will be injected dynamically via JS -->
+    </div>
+
+    <div class="nav-buttons" id="nav-buttons">
+        <button class="btn-next" id="next-btn" disabled onclick="nextQuestion()">Lanjut</button>
+    </div>
+
+    <!-- Result Screen -->
+    <div class="result-screen" id="result-screen">
+        <div class="score-circle" id="score-circle">0/10</div>
+        <div class="result-title" id="result-title">Luar Biasa!</div>
+        <div class="result-feedback" id="result-feedback">Kamu telah menyelesaikan tes evaluasi mingguanmu.</div>
+        
+        <button class="btn-restart" onclick="restartQuiz()">Ulangi Tes</button>
+
+        <div class="review-section">
+            <div class="review-title">Evaluasi Jawaban:</div>
+            <div id="review-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            tag: "Day 1: Introduction",
+            question: "Lengkapi kalimat perkenalan diri berikut dengan benar: \"Hello, my name is Budi. I _____ originally from Jakarta, and I work _____ a graphic designer.\"",
+            options: [
+                "am, as",
+                "is, like",
+                "are, at",
+                "was, as"
+            ],
+            correct: 0,
+            explanation: "Untuk menyatakan asal diri sendiri gunakan kata kerja bantu 'am' (I am originally from...). Dan untuk menerangkan posisi pekerjaan secara profesional gunakan kata depan 'as' (I work as a...)."
+        },
+        {
+            tag: "Day 2: Hobbies",
+            question: "Manakah ekspresi ketertarikan hobi yang tepat sesuai kaidah struktur 'keen on' di modul?",
+            options: [
+                "I am keen on listen to music.",
+                "I am keen on listening to music.",
+                "I keen on listening to music.",
+                "I am keen on to listen to music."
+            ],
+            correct: 1,
+            explanation: "Setelah frasa 'keen on' (sangat menyukai/tertarik), kata kerja yang mengikuti wajib menggunakan bentuk Gerund atau Verb-ing. Jadi yang benar adalah 'keen on listening'."
+        },
+        {
+            tag: "Day 3: Numbers in Real Life",
+            question: "Kantor Anda berada di lantai 2. Bagaimanakah cara penulisan tingkat lantai bangunan menggunakan Ordinal Number yang benar?",
+            options: [
+                "Our office is on the two floor.",
+                "Our office is on the second floor.",
+                "Our office is on the 2th floor.",
+                "Our office is on the twice floor."
+            ],
+            correct: 1,
+            explanation: "Untuk menyatakan tingkat, tingkatan lantai, atau tanggal, gunakan Ordinal Numbers (first, second, third, dst.). Lantai 2 ditulis 'second floor' atau '2nd floor'."
+        },
+        {
+            tag: "Day 3: Numbers in Real Life",
+            question: "Bagaimana cara membaca nominal desimal/harga '$1.55' dengan benar sesuai materi modul?",
+            options: [
+                "One point fifty-five dollars",
+                "One dollar, fifty-five cents",
+                "One dollars and fifty-five point",
+                "One point fifty-five cents"
+            ],
+            correct: 1,
+            explanation: "Dalam bahasa Inggris sehari-hari, harga desimal berupa mata uang dibaca nominal utamanya dahulu lalu diikuti sennya: 'One dollar, fifty-five cents' atau disingkat 'One dollar, fifty-five'."
+        },
+        {
+            tag: "Day 4: Time & Schedule",
+            question: "Bagaimana cara membaca waktu jam 08:55 menggunakan British Style?",
+            options: [
+                "Eight fifty-five",
+                "Five past nine",
+                "Five to nine",
+                "Five to eight"
+            ],
+            correct: 2,
+            explanation: "Gaya British membaca menitnya dahulu baru jamnya. Jam 08:55 artinya kurang 5 menit menuju jam 9, maka dibaca: 'Five (menit) + to (kurang) + nine (jam + 1)' -> 'Five to nine'."
+        },
+        {
+            tag: "Day 4: Time & Schedule",
+            question: "Bagaimana cara membaca waktu jam 07:07 menggunakan American Style?",
+            options: [
+                "Seven oh seven",
+                "Seven past seven",
+                "Seven seven",
+                "Seven zero seven"
+            ],
+            correct: 0,
+            explanation: "Gaya American membaca jam secara langsung: Jam + Menit. Jika menitnya berangka 1 sampai 9, angka nol di tengah wajib diucapkan sebagai 'Oh'. Sehingga menjadi 'Seven oh seven'."
+        },
+        {
+            tag: "Day 5: Present Simple Tense",
+            question: "Pilih bentuk kata kerja (Verb) Present Simple yang benar untuk kalimat ini: \"She _____ English every day.\"",
+            options: [
+                "study",
+                "studies",
+                "studying",
+                "studied"
+            ],
+            correct: 1,
+            explanation: "Pada pola kalimat positif Present Simple Tense, jika subjeknya berupa orang ketiga tunggal (She/He/It), kata kerjanya wajib ditambah akhiran -s/-es. Kata 'study' berubah menjadi 'studies'."
+        },
+        {
+            tag: "Day 5: Present Simple Tense",
+            question: "Ubah kalimat positif berikut menjadi bentuk Negatif (-): \"I drink coffee every morning.\"",
+            options: [
+                "I am not drink coffee every morning.",
+                "I doesn't drink coffee every morning.",
+                "I don't drink coffee every morning.",
+                "I not drink coffee every morning."
+            ],
+            correct: 2,
+            explanation: "Untuk membuat kalimat negatif Present Simple Tense dengan subjek I/You/We/They, gunakan kata bantu 'do not' atau 'don't' diikuti kata kerja dasar (Verb 1)."
+        },
+        {
+            tag: "Day 5: Present Simple Tense",
+            question: "Ubah kalimat positif berikut menjadi bentuk Tanya (?): \"They play football every weekend.\"",
+            options: [
+                "Does they play football every weekend?",
+                "Do they play football every weekend?",
+                "Are they play football every weekend?",
+                "Did they play football every weekend?"
+            ],
+            correct: 1,
+            explanation: "Untuk kalimat tanya (Question) Present Simple Tense dengan subjek I/You/We/They, letakkan kata bantu 'Do' di awal kalimat sebelum subjek."
+        },
+        {
+            tag: "Day 5: Daily Activity",
+            question: "Manakah pilihan kata hubung urutan (Sequence Words) yang paling logis untuk melengkapi rutinitas ini: \"_____, I wake up. _____ , I take a shower.\"",
+            options: [
+                "Finally, Then",
+                "First, Before",
+                "First, Then",
+                "Next, Finally"
+            ],
+            correct: 2,
+            explanation: "Urutan aktivitas logis dimulai dari kata keterangan pertama yaitu 'First' (Pertama-tama), kemudian diikuti oleh kata sambung kelanjutan seperti 'Then' (Lalu/Kemudian)."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+
+    const questionsContainer = document.getElementById("quiz-questions");
+    const nextButton = document.getElementById("next-btn");
+    const progressBar = document.getElementById("progress-bar");
+    const progressContainer = document.getElementById("progress-container");
+    const navButtons = document.getElementById("nav-buttons");
+    const resultScreen = document.getElementById("result-screen");
+    const quizHeader = document.getElementById("quiz-header");
+
+    function initQuiz() {
+        questionsContainer.innerHTML = "";
+        quizData.forEach((q, index) => {
+            const card = document.createElement("div");
+            card.className = `question-card ${index === 0 ? 'active' : ''}`;
+            card.id = `qcard-${index}`;
+
+            let optionsHtml = "";
+            q.options.forEach((opt, optIdx) => {
+                const prefix = String.fromCharCode(65 + optIdx); // A, B, C, D
+                optionsHtml += `
+                    <li class="option-item" onclick="selectOption(${index}, ${optIdx}, this)">
+                        <span class="option-prefix">${prefix}</span>
+                        <span class="option-text">${opt}</span>
+                    </li>
+                `;
+            });
+
+            card.innerHTML = `
+                <span class="question-tag">${q.tag}</span>
+                <div class="question-text">${index + 1}. ${q.question}</div>
+                <ul class="options-list">${optionsHtml}</ul>
+            `;
+            questionsContainer.appendChild(card);
+        });
+        updateProgressBar();
+    }
+
+    function selectOption(qIdx, optIdx, element) {
+        // Remove selection from others
+        const siblings = element.parentNode.querySelectorAll(".option-item");
+        siblings.forEach(sib => sib.classList.remove("selected"));
+
+        // Add selection to current
+        element.classList.add("selected");
+
+        userAnswers[qIdx] = optIdx;
+        nextButton.disabled = false;
+
+        if (qIdx === quizData.length - 1) {
+            nextButton.innerText = "Selesai & Lihat Hasil";
+        }
+    }
+
+    function nextQuestion() {
+        const currentCard = document.getElementById(`qcard-${currentQuestionIndex}`);
+        currentCard.classList.remove("active");
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizData.length) {
+            const nextCard = document.getElementById(`qcard-${currentQuestionIndex}`);
+            nextCard.classList.add("active");
+            nextButton.disabled = userAnswers[currentQuestionIndex] === undefined;
+            if (currentQuestionIndex === quizData.length - 1 && userAnswers[currentQuestionIndex] !== undefined) {
+                nextButton.innerText = "Selesai & Lihat Hasil";
+            } else {
+                nextButton.innerText = "Lanjut";
+            }
+            updateProgressBar();
+        } else {
+            showResults();
+        }
+    }
+
+    function updateProgressBar() {
+        const percent = ((currentQuestionIndex) / quizData.length) * 100;
+        progressBar.style.width = `${percent}%`;
+    }
+
+    function showResults() {
+        progressContainer.style.display = "none";
+        questionsContainer.style.display = "none";
+        navButtons.style.display = "none";
+        resultScreen.style.class = "result-screen active";
+        resultScreen.style.display = "block";
+
+        quizHeader.querySelector("h1").innerText = "Hasil Evaluasi Kuis Kamu";
+        quizHeader.querySelector("p").innerText = "Analisis jawaban berdasarkan modul Basic 1";
+
+        let score = 0;
+        const reviewList = document.getElementById("review-list");
+        reviewList.innerHTML = "";
+
+        quizData.forEach((q, index) => {
+            const isCorrect = userAnswers[index] === q.correct;
+            if (isCorrect) score++;
+
+            const userAnsText = q.options[userAnswers[index]];
+            const correctAnsText = q.options[q.correct];
+
+            const reviewItem = document.createElement("div");
+            reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            reviewItem.innerHTML = `
+                <div class="review-q-text">${index + 1}. ${q.question}</div>
+                <div class="review-ans" style="color: ${isCorrect ? 'var(--success-color)' : 'var(--error-color)'}">
+                    <strong>Jawaban Kamu:</strong> ${userAnsText} ${isCorrect ? '✓' : '✗'}
+                </div>
+                ${!isCorrect ? `<div class="review-ans" style="color: var(--success-color)"><strong>Jawaban Benar:</strong> ${correctAnsText}</div>` : ''}
+                <div class="review-explanation">
+                    <strong>Penjelasan Modul:</strong> ${q.explanation}
+                </div>
+            `;
+            reviewList.appendChild(reviewItem);
+        });
+
+        document.getElementById("score-circle").innerText = `${score}/${quizData.length}`;
+        
+        const titleElement = document.getElementById("result-title");
+        if (score === 10) titleElement.innerText = "Sempurna! Perfect Score!";
+        else if (score >= 7) titleElement.innerText = "Kerja Bagus! Kemampuan Kamu Sudah Mantap!";
+        else titleElement.innerText = "Tetap Semangat! Yuk Review Lagi Modulnya!";
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        userAnswers = [];
+        nextButton.innerText = "Lanjut";
+        nextButton.disabled = true;
+        
+        progressContainer.style.display = "block";
+        questionsContainer.style.display = "block";
+        navButtons.style.display = "flex";
+        resultScreen.style.display = "none";
+
+        quizHeader.querySelector("h1").innerText = "Mini Test: English Basic 1";
+        quizHeader.querySelector("p").innerText = "Materi Day 1 - Day 5 (Speaking Partner)";
+
+        initQuiz();
+    }
+
+    // Run on startup
+    initQuiz();
+</script>
+
+</body>
+</html>
